@@ -10,9 +10,10 @@ const validGroups = new Set(["Atlanta", "Boston", "Florida", "Bến Tre", "Bình
 async function currentAdmin() {
   const groupSession = await getGroupSession();
   if (groupSession) {
+    const isSharedMaster = groupSession.username === "atlanta";
     return {
       user: { userId: `group:${groupSession.username}`, email: groupSession.username, displayName: `Nhóm ${groupSession.groupName}`, fullName: null },
-      admin: { id: 0, email: groupSession.username, role: "group" as const, groupName: groupSession.groupName, createdAt: "" },
+      admin: { id: 0, email: groupSession.username, role: isSharedMaster ? "master" as const : "group" as const, groupName: isSharedMaster ? null : groupSession.groupName, createdAt: "" },
       db: getDb(),
       authKind: "group" as const,
     };
