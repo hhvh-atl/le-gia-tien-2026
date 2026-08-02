@@ -1,7 +1,10 @@
 import { and, desc, eq, sql } from "drizzle-orm";
+import { env } from "cloudflare:workers";
 import { getDb } from "../../../db";
 import { administrators, registrations } from "../../../db/schema";
 import { getChatGPTUser } from "../../chatgpt-auth";
+
+const validGroups = new Set(["Atlanta", "Boston", "Florida", "Bến Tre", "Bình Dương", "Sài Gòn", "Phan Rang", "Quảng Ninh"]);
 
 async function currentAdmin() {
   const user = await getChatGPTUser();
@@ -10,7 +13,10 @@ async function currentAdmin() {
   let [admin] = await db.select().from(administrators).where(eq(administrators.email, user.email.toLowerCase())).limit(1);
   if (!admin) {
     const [{ count }] = await db.select({ count: sql<number>`count(*)` }).from(administrators);
-    if (!count) [admin] = await db.insert(administrators).values({ email: user.email.toLowerCase(), role: "master", groupName: null, createdAt: new Date().toISOString() }).returning();
+    const configuredMaster = String((env as unknown as Record<string, unknown>).MASTER_EMAIL || "").trim().toLowerCase();
+    if (!count && configuredMaster && user.email.toLowerCase() === configuredMaster) {
+      [admin] = await db.insert(administrators).values({ email: user.email.toLowerCase(), role: "master", groupName: null, createdAt: new Date().toISOString() }).returning();
+    }
   }
   if (!admin) return { error: Response.json({ error: "Tài khoản chưa được cấp quyền." }, { status: 403 }) };
   return { user, admin, db };
@@ -34,7 +40,9 @@ export async function POST(request: Request) {
   const payload = await request.json() as { email?: string; groupName?: string };
   const email = payload.email?.trim().toLowerCase() || "";
   const groupName = payload.groupName?.trim() || "";
-  if (!email.includes("@") || !groupName) return Response.json({ error: "Email và nhóm là bắt buộc." }, { status: 400 });
+  if (!email.includes("@") || !validGroups.has(groupName)) return Response.json({ error: "Email hoặc nhóm không hợp lệ." }, { status: 400 });
+  const [existing] = await auth.db.select().from(administrators).where(eq(administrators.email, email)).limit(1);
+  if (existing?.role === "master") return Response.json({ error: "Không thể đổi tài khoản tổng quản lý thành quản lý nhóm." }, { status: 409 });
   await auth.db.insert(administrators).values({ email, role: "group", groupName, createdAt: new Date().toISOString() }).onConflictDoUpdate({ target: administrators.email, set: { role: "group", groupName } });
   return Response.json({ ok: true }, { status: 201 });
 }
