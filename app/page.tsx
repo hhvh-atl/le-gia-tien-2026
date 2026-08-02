@@ -19,7 +19,7 @@ export default function Home() {
 
       <section className="hero">
         <div className="eyebrow"><span /> Đăng ký đang mở</div>
-        <h1>Ghi danh người thân<br/><em>trong lời cầu nguyện.</em></h1>
+        <h1>Ghi danh người thân<br/><em>và dâng lời cầu nguyện cho Lễ Gia Tiên 2026.</em></h1>
         <p>Xin điền thông tin bên dưới. Mỗi đăng ký sẽ được gửi đến đúng nhóm phụ trách để chuẩn bị danh sách cầu nguyện.</p>
       </section>
 
