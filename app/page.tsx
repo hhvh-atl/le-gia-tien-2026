@@ -12,7 +12,7 @@ export default function Home() {
       <header className="topbar">
         <a className="brand" href="/" aria-label="Trang chủ">
           <img className="brand-logo" src="/logo.png" alt="Hội Huyền Vi Học" />
-          <span><strong>Lễ Gia Tiên 2026</strong></span>
+          <span><strong>Hội Huyền Vi Học</strong><small>Lễ Gia Tiên 2026</small></span>
         </a>
         <a className="admin-link" href="/dashboard">Khu vực quản lý <span>→</span></a>
       </header>
