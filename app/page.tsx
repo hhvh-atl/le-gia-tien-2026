@@ -14,7 +14,7 @@ export default function Home() {
           <img className="brand-logo" src="/logo.png" alt="Hội Huyền Vi Học" />
           <span><strong>Hội Huyền Vi Học</strong><small>Lễ Gia Tiên 2026</small></span>
         </a>
-        <a className="admin-link" href="/dashboard">Khu vực quản lý <span>→</span></a>
+        <a className="admin-link" href="/login">Khu vực quản lý <span>→</span></a>
       </header>
 
       <section className="hero">
@@ -27,7 +27,7 @@ export default function Home() {
 
       <footer>
         <p>Thông tin của quý vị chỉ được chia sẻ với người quản lý của nhóm đã chọn.</p>
-        <a href="/dashboard">Dành cho người quản lý</a>
+        <a href="/login">Dành cho người quản lý</a>
       </footer>
     </main>
   );

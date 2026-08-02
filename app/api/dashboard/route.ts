@@ -3,10 +3,20 @@ import { env } from "cloudflare:workers";
 import { getDb } from "../../../db";
 import { administrators, registrations } from "../../../db/schema";
 import { getChatGPTUser } from "../../chatgpt-auth";
+import { getGroupSession } from "../../group-auth";
 
 const validGroups = new Set(["Atlanta", "Boston", "Florida", "Bến Tre", "Bình Dương", "Sài Gòn", "Phan Rang", "Quảng Ninh"]);
 
 async function currentAdmin() {
+  const groupSession = await getGroupSession();
+  if (groupSession) {
+    return {
+      user: { userId: `group:${groupSession.username}`, email: groupSession.username, displayName: `Nhóm ${groupSession.groupName}`, fullName: null },
+      admin: { id: 0, email: groupSession.username, role: "group" as const, groupName: groupSession.groupName, createdAt: "" },
+      db: getDb(),
+      authKind: "group" as const,
+    };
+  }
   const user = await getChatGPTUser();
   if (!user) return { error: Response.json({ error: "Vui lòng đăng nhập." }, { status: 401 }) };
   const db = getDb();
@@ -19,7 +29,7 @@ async function currentAdmin() {
     }
   }
   if (!admin) return { error: Response.json({ error: "Tài khoản chưa được cấp quyền." }, { status: 403 }) };
-  return { user, admin, db };
+  return { user, admin, db, authKind: "chatgpt" as const };
 }
 
 export async function GET() {
@@ -30,7 +40,7 @@ export async function GET() {
     ? await db.select().from(registrations).orderBy(desc(registrations.createdAt))
     : await db.select().from(registrations).where(eq(registrations.groupName, admin.groupName || "")).orderBy(desc(registrations.createdAt));
   const admins = admin.role === "master" ? await db.select().from(administrators).orderBy(administrators.email) : [];
-  return Response.json({ user: { email: user.email, displayName: user.displayName }, admin, registrations: rows, administrators: admins });
+  return Response.json({ user: { email: user.email, displayName: user.displayName }, admin, authKind: auth.authKind, registrations: rows, administrators: admins });
 }
 
 export async function POST(request: Request) {
