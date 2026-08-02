@@ -57,12 +57,44 @@ export async function POST(request: Request) {
   return Response.json({ ok: true }, { status: 201 });
 }
 
+export async function PATCH(request: Request) {
+  const auth = await currentAdmin();
+  if (auth.error) return auth.error;
+  const payload = await request.json() as { id?: number; registrantName?: string; deceasedName?: string; relationship?: string; prayerYear?: number; groupName?: string; notes?: string };
+  const id = Number(payload.id);
+  const registrantName = payload.registrantName?.trim() || "";
+  const deceasedName = payload.deceasedName?.trim() || "";
+  const relationship = payload.relationship?.trim() || "";
+  const prayerYear = Number(payload.prayerYear);
+  const groupName = payload.groupName?.trim() || "";
+  const notes = payload.notes?.trim() || "";
+  if (!id || !registrantName || !deceasedName || !relationship || ![1, 2, 3, 4].includes(prayerYear) || !validGroups.has(groupName)) {
+    return Response.json({ error: "Thông tin chỉnh sửa không hợp lệ." }, { status: 400 });
+  }
+  const [existing] = await auth.db.select().from(registrations).where(eq(registrations.id, id)).limit(1);
+  if (!existing) return Response.json({ error: "Không tìm thấy đăng ký." }, { status: 404 });
+  if (auth.admin.role !== "master" && (existing.groupName !== auth.admin.groupName || groupName !== auth.admin.groupName)) {
+    return Response.json({ error: "Không có quyền chỉnh sửa đăng ký này." }, { status: 403 });
+  }
+  const [updated] = await auth.db.update(registrations).set({ registrantName, deceasedName, relationship, prayerYear, groupName, notes }).where(eq(registrations.id, id)).returning();
+  return Response.json({ registration: updated });
+}
+
 export async function DELETE(request: Request) {
   const auth = await currentAdmin();
   if (auth.error) return auth.error;
+  const url = new URL(request.url);
+  const recordId = Number(url.searchParams.get("id"));
+  if (recordId) {
+    const [existing] = await auth.db.select().from(registrations).where(eq(registrations.id, recordId)).limit(1);
+    if (!existing) return Response.json({ error: "Không tìm thấy đăng ký." }, { status: 404 });
+    if (auth.admin.role !== "master" && existing.groupName !== auth.admin.groupName) return Response.json({ error: "Không có quyền xóa đăng ký này." }, { status: 403 });
+    await auth.db.delete(registrations).where(eq(registrations.id, recordId));
+    return Response.json({ ok: true });
+  }
   if (auth.admin.role !== "master") return Response.json({ error: "Không có quyền." }, { status: 403 });
-  const email = new URL(request.url).searchParams.get("email")?.toLowerCase();
-  if (!email) return Response.json({ error: "Thiếu email." }, { status: 400 });
+  const email = url.searchParams.get("email")?.toLowerCase();
+  if (!email) return Response.json({ error: "Thiếu email hoặc mã đăng ký." }, { status: 400 });
   await auth.db.delete(administrators).where(and(eq(administrators.email, email), eq(administrators.role, "group")));
   return Response.json({ ok: true });
 }
