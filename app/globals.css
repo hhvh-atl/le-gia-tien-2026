@@ -10,7 +10,7 @@ a { color:inherit; text-decoration:none; }
 .site-shell { min-height:100vh; background:linear-gradient(180deg,rgba(255,255,255,.55),transparent 420px),var(--cream); }
 .topbar { max-width:1180px; height:98px; margin:auto; padding:0 28px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid rgba(20,38,61,.12); }
 .brand { display:flex; align-items:center; gap:12px; }
-.brand-mark { width:44px; height:44px; border:1px solid var(--gold); border-radius:50%; display:grid; place-items:center; color:var(--forest); font-family:"Playfair Display"; font-size:14px; letter-spacing:.05em; }
+.brand-logo { width:54px; height:54px; object-fit:contain; border-radius:50%; flex:0 0 auto; }
 .brand strong,.brand small { display:block; }
 .brand strong { font-family:"Playfair Display"; font-size:21px; line-height:1; }
 .brand small { margin-top:5px; color:#667a94; font-size:10px; text-transform:uppercase; letter-spacing:.18em; }
@@ -57,7 +57,8 @@ footer a { font-weight:700; color:var(--forest); }
 
 .dashboard-shell { min-height:100vh; display:grid; grid-template-columns:245px 1fr; background:#eef0eb; }
 .sidebar { position:sticky; top:0; height:100vh; background:#12345d; color:#fff; padding:27px 22px; display:flex; flex-direction:column; }
-.brand.light .brand-mark { border-color:#9db5ad; }
+.brand.light .brand-logo { background:#fff; box-shadow:0 0 0 2px rgba(255,255,255,.2); }
+.sidebar .brand strong { font-size:16px; line-height:1.15; }
 .brand.light small { color:#9db5ad; }
 .sidebar nav { margin-top:55px; display:flex; flex-direction:column; gap:7px; }
 .sidebar nav button { border:0; background:transparent; color:#b7cac3; text-align:left; padding:13px 14px; border-radius:4px; cursor:pointer; }

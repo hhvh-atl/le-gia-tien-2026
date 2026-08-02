@@ -11,8 +11,8 @@ export default function Home() {
     <main className="site-shell">
       <header className="topbar">
         <a className="brand" href="/" aria-label="Trang chủ">
-          <span className="brand-mark">AN</span>
-          <span><strong>Ân Nghĩa</strong><small>Gia Tiên 2026</small></span>
+          <img className="brand-logo" src="/logo.png" alt="Hội Huyền Vi Học" />
+          <span><strong>Hội Huyền Vi Học</strong><small>Gia Tiên 2026</small></span>
         </a>
         <a className="admin-link" href="/dashboard">Khu vực quản lý <span>→</span></a>
       </header>
