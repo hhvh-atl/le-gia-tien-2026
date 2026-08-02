@@ -21,11 +21,6 @@ export default function Home() {
         <div className="eyebrow"><span /> Đăng ký đang mở</div>
         <h1>Ghi danh người thân<br/><em>trong lời cầu nguyện.</em></h1>
         <p>Xin điền thông tin bên dưới. Mỗi đăng ký sẽ được gửi đến đúng nhóm phụ trách để chuẩn bị danh sách cầu nguyện.</p>
-        <div className="hero-meta">
-          <div><b>08</b><span>Nhóm phụ trách</span></div>
-          <div><b>01–04</b><span>Năm cầu nguyện</span></div>
-          <div><b>2 phút</b><span>Thời gian điền</span></div>
-        </div>
       </section>
 
       <RegistrationForm />
